@@ -1,0 +1,42 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && firestore.get(
+          /databases/(default)/documents/users/$(request.auth.uid)
+        ).data.role == 'admin';
+    }
+
+    function reportCanBeRead(reportId, ownerUid) {
+      let report = firestore.get(
+        /databases/(default)/documents/reports/$(reportId)
+      ).data;
+      return report.ownerUid == ownerUid
+        && (
+          request.auth.uid == ownerUid
+          || isAdmin()
+          || (
+            firestore.get(
+              /databases/(default)/documents/users/$(request.auth.uid)
+            ).data.role == 'maintenance'
+            && report.assignedToUid == request.auth.uid
+          )
+        );
+    }
+
+    match /reports/{ownerUid}/{reportId} {
+      allow create: if signedIn()
+        && request.auth.uid == ownerUid
+        && request.resource.size <= 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow read: if signedIn() && reportCanBeRead(reportId, ownerUid);
+      allow update, delete: if false;
+    }
+  }
+}

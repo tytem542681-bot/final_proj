@@ -1,0 +1,131 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userRole() {
+      return signedIn()
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid))
+            .data.role
+        : null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && userRole() == 'admin';
+    }
+
+    function isMaintenanceStaff() {
+      return signedIn() && userRole() == 'maintenance';
+    }
+
+    function isValidMaintenanceAssignment() {
+      let staffId = request.resource.data.assignedToUid;
+      return staffId == null
+        ? request.resource.data.assignedToEmail == null
+          && request.resource.data.assignee == null
+        : exists(/databases/$(database)/documents/users/$(staffId))
+          && get(/databases/$(database)/documents/users/$(staffId))
+              .data.role == 'maintenance'
+          && get(/databases/$(database)/documents/users/$(staffId))
+              .data.email == request.resource.data.assignedToEmail;
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.role == 'campusUser'
+        && request.resource.data.email == request.auth.token.email
+        && (!('requestedRole' in request.resource.data)
+          || request.resource.data.requestedRole in ['campusUser', 'maintenance'])
+        && request.resource.data.keys().hasOnly([
+          'displayName',
+          'email',
+          'role',
+          'requestedRole',
+          'createdAt'
+        ]);
+      allow update: if (
+          signedIn()
+          && request.auth.uid == userId
+          && request.resource.data.role == resource.data.role
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'displayName',
+            'email',
+            'updatedAt'
+          ])
+        ) || (
+          isAdmin()
+          && resource.data.role == 'campusUser'
+          && resource.data.requestedRole == 'maintenance'
+          && request.resource.data.role == 'maintenance'
+          && !('requestedRole' in request.resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'role',
+            'requestedRole',
+            'updatedAt'
+          ])
+        );
+      allow delete: if false;
+    }
+
+    match /reports/{reportId} {
+      allow create: if signedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasOnly([
+          'id',
+          'title',
+          'category',
+          'building',
+          'room',
+          'priority',
+          'description',
+          'reporter',
+          'createdAt',
+          'status',
+          'activities',
+          'photoPath',
+          'assignee',
+          'assignedToUid',
+          'assignedToEmail',
+          'ownerUid'
+        ])
+        && request.resource.data.assignedToUid == null
+        && request.resource.data.assignedToEmail == null
+        && request.resource.data.assignee == null;
+      allow read: if signedIn()
+        && (
+          resource.data.ownerUid == request.auth.uid
+          || isAdmin()
+          || (
+            isMaintenanceStaff()
+            && resource.data.assignedToUid == request.auth.uid
+          )
+        );
+      allow update: if (
+          isAdmin()
+          && isValidMaintenanceAssignment()
+        ) || (
+          isMaintenanceStaff()
+          && resource.data.assignedToUid == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'status',
+            'activities'
+          ])
+          && request.resource.data.status in [
+            'pending',
+            'underReview',
+            'inProgress',
+            'resolved',
+            'rejected'
+          ]
+        );
+      allow delete: if false;
+    }
+  }
+}

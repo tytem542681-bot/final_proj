@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "650400661710",
+    "project_id": "fixtrack-campus-app",
+    "storage_bucket": "fixtrack-campus-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:650400661710:android:6cf103570d744c0581509f",
+        "android_client_info": {
+          "package_name": "com.example.finalproj"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJRMG_4AXl9jpEbY064jrrtgzK0EXijwQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
