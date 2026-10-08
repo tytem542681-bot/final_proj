@@ -46,7 +46,7 @@ class ReportActivity {
     return ReportActivity(
       message: json['message'] as String? ?? '',
       createdAt:
-          DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+          DateTime.tryParse(json['createdAt'] as String? ?? '')?.toLocal() ??
           DateTime.now(),
       status: statusName == null
           ? null
@@ -129,7 +129,7 @@ class MaintenanceReport {
       description: json['description'] as String? ?? '',
       reporter: json['reporter'] as String? ?? '',
       createdAt:
-          DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+          DateTime.tryParse(json['createdAt'] as String? ?? '')?.toLocal() ??
           DateTime.now(),
       status: ReportStatus.values.firstWhere(
         (value) => value.name == statusName,

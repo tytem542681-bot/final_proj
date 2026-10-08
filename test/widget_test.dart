@@ -261,6 +261,32 @@ void main() {
     expect(reloadedStore.myReports.first.photoPath, report.photoPath);
   });
 
+  test('server UTC timestamps are converted to local report time', () {
+    final serverTime = DateTime.utc(2026, 10, 8, 4, 30);
+    final report = MaintenanceReport.fromJson({
+      'id': 'FT-2026-12345678',
+      'title': 'Broken window',
+      'category': 'Other',
+      'building': 'Main Building',
+      'room': 'Room 12',
+      'priority': 'medium',
+      'description': 'The window is cracked.',
+      'reporter': 'alex.morgan@campus.edu',
+      'createdAt': serverTime.toIso8601String(),
+      'status': 'pending',
+      'activities': [
+        {
+          'message': 'Report submitted.',
+          'createdAt': serverTime.toIso8601String(),
+          'status': 'pending',
+        },
+      ],
+    });
+
+    expect(report.createdAt, serverTime.toLocal());
+    expect(report.activities.single.createdAt, serverTime.toLocal());
+  });
+
   test(
     'report updates and notification state survive a local reload',
     () async {

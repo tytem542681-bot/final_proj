@@ -179,6 +179,24 @@ class LocalStore extends ChangeNotifier {
         _reports = snapshot.docs.map((document) {
           final data = document.data();
           data['id'] = document.id;
+          final createdAt = data['createdAt'];
+          if (createdAt is Timestamp) {
+            data['createdAt'] = createdAt.toDate().toIso8601String();
+          }
+          final activities = data['activities'];
+          if (activities is List) {
+            data['activities'] = activities.map((activity) {
+              if (activity is! Map<String, dynamic>) return activity;
+              final normalizedActivity = Map<String, dynamic>.of(activity);
+              final activityCreatedAt = normalizedActivity['createdAt'];
+              if (activityCreatedAt is Timestamp) {
+                normalizedActivity['createdAt'] = activityCreatedAt
+                    .toDate()
+                    .toIso8601String();
+              }
+              return normalizedActivity;
+            }).toList();
+          }
           if (data['photoPath'] == null &&
               localPhotos.containsKey(document.id)) {
             data['photoPath'] = localPhotos[document.id];
@@ -336,6 +354,13 @@ class LocalStore extends ChangeNotifier {
           .doc(report.id)
           .set({
             ...report.toJson(),
+            'createdAt': FieldValue.serverTimestamp(),
+            'activities': [
+              {
+                ...report.activities.first.toJson(),
+                'createdAt': FieldValue.serverTimestamp(),
+              },
+            ],
             'photoPath': null,
             'ownerUid': firebaseUid,
           })
