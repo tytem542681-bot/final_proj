@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -230,6 +233,32 @@ void main() {
       ),
       throwsFormatException,
     );
+  });
+
+  test('photo evidence is saved locally with the report', () async {
+    final store = await LocalStore.load();
+    final photoBytes = Uint8List.fromList([1, 2, 3, 4]);
+
+    final report = await store.createReport(
+      ReportDraft(
+        title: 'Broken window',
+        category: 'Other',
+        building: 'Main Building',
+        room: 'Room 12',
+        priority: ReportPriority.medium,
+        description: 'The window is cracked.',
+        reporter: store.email,
+        photoBytes: photoBytes,
+        photoContentType: 'image/jpeg',
+      ),
+    );
+
+    expect(
+      report.photoPath,
+      'data:image/jpeg;base64,${base64Encode(photoBytes)}',
+    );
+    final reloadedStore = await LocalStore.load();
+    expect(reloadedStore.myReports.first.photoPath, report.photoPath);
   });
 
   test(

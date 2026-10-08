@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -153,6 +154,10 @@ class LocalStore extends ChangeNotifier {
       orElse: () => UserRole.campusUser,
     );
     _firebaseSyncError = null;
+    final savedReports = _preferences.getString('$_reportsKey.${account.uid}');
+    if (savedReports != null) {
+      _reports = reportsFromJson(savedReports);
+    }
 
     final reports = FirebaseService.firestore.collection('reports');
     final query = switch (_role) {
@@ -166,9 +171,18 @@ class LocalStore extends ChangeNotifier {
     final firstSnapshot = Completer<void>();
     _reportsSubscription = query.snapshots().listen(
       (snapshot) {
+        final localPhotos = {
+          for (final report in _reports)
+            if (report.photoPath?.startsWith('data:image/') == true)
+              report.id: report.photoPath!,
+        };
         _reports = snapshot.docs.map((document) {
           final data = document.data();
           data['id'] = document.id;
+          if (data['photoPath'] == null &&
+              localPhotos.containsKey(document.id)) {
+            data['photoPath'] = localPhotos[document.id];
+          }
           return MaintenanceReport.fromJson(data);
         }).toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
         _firebaseSyncError = null;
@@ -242,10 +256,14 @@ class LocalStore extends ChangeNotifier {
     final reportsKey = _firebaseUid == null
         ? _reportsKey
         : '$_reportsKey.${_firebaseUid!}';
-    final saved = await _preferences.setString(
-      reportsKey,
-      reportsToJson(_reports),
-    );
+    final saved = await _preferences
+        .setString(reportsKey, reportsToJson(_reports))
+        .timeout(
+          const Duration(seconds: 15),
+          onTimeout: () => throw TimeoutException(
+            'Saving the report locally timed out. Please try again.',
+          ),
+        );
     if (!saved) throw StateError('Could not save maintenance reports locally.');
   }
 
@@ -258,7 +276,9 @@ class LocalStore extends ChangeNotifier {
     }
   }
 
-  Future<MaintenanceReport> createReport(ReportDraft draft) async {
+  Future<MaintenanceReport> createReport(
+    ReportDraft draft,
+  ) async {
     final title = draft.title.trim();
     final category = draft.category.trim();
     final building = draft.building.trim();
@@ -286,15 +306,10 @@ class LocalStore extends ChangeNotifier {
     final reportId =
         'FT-${now.year}-${now.microsecondsSinceEpoch.toString().substring(8)}';
     final firebaseUid = _firebaseUid;
-    var photoPath = draft.photoPath;
-    if (firebaseUid != null && draft.photoBytes != null) {
-      photoPath = await FirebaseService.uploadReportPhoto(
-        uid: firebaseUid,
-        reportId: reportId,
-        bytes: draft.photoBytes!,
-        contentType: draft.photoContentType ?? 'image/jpeg',
-      );
-    }
+    final photoPath = draft.photoBytes == null
+        ? draft.photoPath
+        : 'data:${draft.photoContentType ?? 'image/jpeg'};base64,'
+              '${base64Encode(draft.photoBytes!)}';
     final report = MaintenanceReport(
       id: reportId,
       title: title,
@@ -316,10 +331,21 @@ class LocalStore extends ChangeNotifier {
       ],
     );
     if (firebaseUid != null) {
-      await FirebaseService.firestore.collection('reports').doc(report.id).set({
-        ...report.toJson(),
-        'ownerUid': firebaseUid,
-      });
+      await FirebaseService.firestore
+          .collection('reports')
+          .doc(report.id)
+          .set({
+            ...report.toJson(),
+            'photoPath': null,
+            'ownerUid': firebaseUid,
+          })
+          .timeout(
+            const Duration(seconds: 30),
+            onTimeout: () => throw TimeoutException(
+              'Saving the report timed out. Check your connection and your '
+              'reports before trying again.',
+            ),
+          );
     }
     _reports = [report, ..._reports];
     await _persistReports();

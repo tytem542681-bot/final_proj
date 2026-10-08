@@ -110,26 +110,6 @@ class FirebaseService {
 
   static FirebaseStorage get storage => FirebaseStorage.instance;
 
-  static Future<String> uploadReportPhoto({
-    required String uid,
-    required String reportId,
-    required Uint8List bytes,
-    required String contentType,
-  }) async {
-    if (!isReady) {
-      throw StateError('Firebase is not initialized on this platform.');
-    }
-    if (bytes.isEmpty) {
-      throw const FormatException('The selected photo is empty.');
-    }
-    if (bytes.lengthInBytes > 10 * 1024 * 1024) {
-      throw const FormatException('Photos must be 10 MB or smaller.');
-    }
-    final reference = storage.ref('reports/$uid/$reportId');
-    await reference.putData(bytes, SettableMetadata(contentType: contentType));
-    return reference.fullPath;
-  }
-
   static Future<FirebaseAccount> signIn({
     required String email,
     required String password,

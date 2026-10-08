@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -1018,7 +1020,10 @@ class _MainShellState extends State<MainShell> {
             onNewReport: _openReportForm,
             onNotifications: _openNotifications,
           ),
-          ReportListPage(store: widget.store),
+          ReportListPage(
+            store: widget.store,
+            onBackToHome: () => setState(() => _selectedIndex = 0),
+          ),
           if (widget.store.isMaintenance) MaintenancePage(store: widget.store),
           ProfilePage(store: widget.store, onLogout: widget.onLogout),
         ];
@@ -1582,9 +1587,10 @@ class _SupportCard extends StatelessWidget {
 }
 
 class ReportListPage extends StatefulWidget {
-  const ReportListPage({required this.store, super.key});
+  const ReportListPage({required this.store, this.onBackToHome, super.key});
 
   final LocalStore store;
+  final VoidCallback? onBackToHome;
 
   @override
   State<ReportListPage> createState() => _ReportListPageState();
@@ -1621,13 +1627,32 @@ class _ReportListPageState extends State<ReportListPage> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
           children: [
-            const Text(
-              'My reports',
-              style: TextStyle(
-                color: _ink,
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-              ),
+            Row(
+              children: [
+                IconButton(
+                  tooltip: 'Back to home',
+                  onPressed: () {
+                    final navigator = Navigator.of(context);
+                    if (navigator.canPop()) {
+                      navigator.pop();
+                    } else {
+                      widget.onBackToHome?.call();
+                    }
+                  },
+                  icon: const Icon(Icons.arrow_back_rounded),
+                ),
+                const SizedBox(width: 4),
+                const Expanded(
+                  child: Text(
+                    'My reports',
+                    style: TextStyle(
+                      color: _ink,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 4),
             Text(
@@ -2118,9 +2143,11 @@ class _ReportFormPageState extends State<ReportFormPage> {
   String? _building;
   ReportPriority _priority = ReportPriority.medium;
   String? _photoPath;
-  XFile? _selectedPhoto;
+  Uint8List? _selectedPhotoBytes;
+  String? _selectedPhotoContentType;
   bool _submitting = false;
   final _picker = ImagePicker();
+  static const _maxPhotoBytes = 3 * 1024 * 1024;
 
   static const _categories = [
     'Electrical',
@@ -2317,7 +2344,8 @@ class _ReportFormPageState extends State<ReportFormPage> {
               ),
               const SizedBox(height: 10),
               const Text(
-                'A photo is optional, but it can help the maintenance team.',
+                'Photo evidence is saved on this device only and is not '
+                'shared with maintenance.',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: _muted, fontSize: 11),
               ),
@@ -2347,7 +2375,8 @@ class _ReportFormPageState extends State<ReportFormPage> {
               tooltip: 'Remove photo',
               onPressed: () => setState(() {
                 _photoPath = null;
-                _selectedPhoto = null;
+                _selectedPhotoBytes = null;
+                _selectedPhotoContentType = null;
               }),
               icon: const Icon(Icons.close_rounded),
             ),
@@ -2398,13 +2427,26 @@ class _ReportFormPageState extends State<ReportFormPage> {
     try {
       final image = await _picker.pickImage(
         source: source,
-        maxWidth: 1600,
-        imageQuality: 82,
+        maxWidth: 1280,
+        imageQuality: 70,
       );
       if (image != null && mounted) {
+        final bytes = await image.readAsBytes().timeout(
+          const Duration(seconds: 15),
+          onTimeout: () => throw TimeoutException(
+            'Reading the selected photo timed out. Please choose it again.',
+          ),
+        );
+        if (bytes.lengthInBytes > _maxPhotoBytes) {
+          throw const FormatException(
+            'Choose a photo smaller than 3 MB so it can be saved on this device.',
+          );
+        }
+        final contentType = image.mimeType ?? 'image/jpeg';
         setState(() {
-          _photoPath = image.path;
-          _selectedPhoto = image;
+          _photoPath = 'data:$contentType;base64,${base64Encode(bytes)}';
+          _selectedPhotoBytes = bytes;
+          _selectedPhotoContentType = contentType;
         });
       }
     } catch (error) {
@@ -2429,17 +2471,23 @@ class _ReportFormPageState extends State<ReportFormPage> {
           description: _descriptionController.text,
           reporter: widget.store.email,
           photoPath: _photoPath,
-          photoBytes: await _selectedPhoto?.readAsBytes(),
-          photoContentType: _selectedPhoto?.mimeType,
+          photoBytes: _selectedPhotoBytes,
+          photoContentType: _selectedPhotoContentType,
         ),
       );
-      if (mounted) Navigator.of(context).pop(report);
+      if (mounted) {
+        Navigator.of(context).pop(report);
+      }
     } catch (error) {
       if (!mounted) return;
-      setState(() => _submitting = false);
+      final message = error is TimeoutException
+          ? error.message ?? 'The request timed out. Please try again.'
+          : error;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not save the report: $error')),
+        SnackBar(content: Text('Could not save the report: $message')),
       );
+    } finally {
+      if (mounted) setState(() => _submitting = false);
     }
   }
 
@@ -3258,6 +3306,20 @@ class _ReportPhotoState extends State<ReportPhoto> {
 }
 
 Widget _imageForPath(String path, {required BoxFit fit}) {
+  if (path.startsWith('data:image/')) {
+    final separator = path.indexOf(',');
+    if (separator < 0) {
+      return const Center(child: Text('Photo is unavailable.'));
+    }
+    try {
+      return Image.memory(
+        base64Decode(path.substring(separator + 1)),
+        fit: fit,
+      );
+    } on FormatException {
+      return const Center(child: Text('Photo is unavailable.'));
+    }
+  }
   final scheme = Uri.tryParse(path)?.scheme;
   if (kIsWeb || scheme == 'http' || scheme == 'https') {
     return Image.network(path, fit: fit);

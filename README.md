@@ -50,12 +50,12 @@ firebase login
 firebase deploy --only firestore:rules,storage
 ```
 
-The deployment uses `firestore.rules` and `storage.rules`. Photo uploads are
-limited to image files of 10 MB or less. Photos are uploaded to Firebase
-Storage, and their object paths are saved with the report so authorized users
-can load them on other devices through the authenticated Storage SDK and its
-security rules.
+The deployment uses `firestore.rules` and `storage.rules`. New photo evidence
+is stored only in the app's local report data and is not uploaded to Firebase
+or shared with other devices. Keep photos at or below 3 MB so they fit in the
+device's local storage. Firebase Storage is used only to display photos from
+older reports that were uploaded by a previous version of the app.
 
 Existing locally saved reports are not migrated to Firestore, and a photo path
-saved by an older app version is still device-local. Create a new report with
-an attached photo after enabling Storage to verify cloud photo sharing.
+saved by an older app version is still device-local. Locally stored photo
+evidence is saved with the report and remains available on that device.
