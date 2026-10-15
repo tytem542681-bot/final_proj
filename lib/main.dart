@@ -288,315 +288,319 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: _deepBlue,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 28, 24, 18),
-          child: Column(
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  color: _green,
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x40F59E0B),
-                      blurRadius: 18,
-                      offset: Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.home_repair_service_rounded,
-                  size: 34,
-                  color: Color(0xFF0A1628),
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'FIXTRACK',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.12,
-                ),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'CAMPUS FACILITY MAINTENANCE',
-                style: TextStyle(
-                  color: Color(0xFF64748B),
-                  fontSize: 10,
-                  letterSpacing: 0.1,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 26),
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: _panelBlue,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF2A4A72)),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _LoginTab(
-                        label: 'Campus',
-                        selected: client,
-                        onTap: () => setState(() => _tab = UserRole.campusUser),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 28, 24, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    color: _green,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x40F59E0B),
+                        blurRadius: 18,
+                        offset: Offset(0, 8),
                       ),
-                    ),
-                    Expanded(
-                      child: _LoginTab(
-                        label: 'Maintenance',
-                        selected: isMaintenance,
-                        onTap: () =>
-                            setState(() => _tab = UserRole.maintenance),
-                      ),
-                    ),
-                    Expanded(
-                      child: _LoginTab(
-                        label: 'Admin',
-                        selected: isAdmin,
-                        onTap: () => setState(() => _tab = UserRole.admin),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: _panelBlue,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: isAdmin
-                        ? const Color(0x40F59E0B)
-                        : const Color(0xFF2A4A72),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.home_repair_service_rounded,
+                    size: 34,
+                    color: Color(0xFF0A1628),
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: isAdmin ? _green : const Color(0xFF10B981),
-                            shape: BoxShape.circle,
+                const SizedBox(height: 16),
+                const Text(
+                  'FIXTRACK',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.12,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'CAMPUS FACILITY MAINTENANCE',
+                  style: TextStyle(
+                    color: Color(0xFF64748B),
+                    fontSize: 10,
+                    letterSpacing: 0.1,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 26),
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: _panelBlue,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFF2A4A72)),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _LoginTab(
+                          label: 'Campus',
+                          selected: client,
+                          onTap: () =>
+                              setState(() => _tab = UserRole.campusUser),
+                        ),
+                      ),
+                      Expanded(
+                        child: _LoginTab(
+                          label: 'Maintenance',
+                          selected: isMaintenance,
+                          onTap: () =>
+                              setState(() => _tab = UserRole.maintenance),
+                        ),
+                      ),
+                      Expanded(
+                        child: _LoginTab(
+                          label: 'Admin',
+                          selected: isAdmin,
+                          onTap: () => setState(() => _tab = UserRole.admin),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: _panelBlue,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isAdmin
+                          ? const Color(0x40F59E0B)
+                          : const Color(0xFF2A4A72),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: isAdmin ? _green : const Color(0xFF10B981),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              isAdmin
+                                  ? 'Campus administrators — review, prioritize, and assign all tickets'
+                                  : isMaintenance
+                                  ? 'Maintenance personnel — view assigned tasks and update progress'
+                                  : 'Students, faculty, and staff — report and track facility issues',
+                              style: const TextStyle(
+                                color: Color(0xFF94A3B8),
+                                fontSize: 11,
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        isAdmin
+                            ? 'ADMIN EMAIL'
+                            : isMaintenance
+                            ? 'MAINTENANCE EMAIL'
+                            : 'EMAIL ADDRESS',
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.06,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      TextField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: isAdmin || isMaintenance
+                              ? 'staff@campus.edu'
+                              : 'you@campus.edu',
+                          hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                          filled: true,
+                          fillColor: const Color(0xFF1A2F52),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF2A4A72),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF2A4A72),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: _green,
+                              width: 1.5,
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'PASSWORD',
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.06,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: '••••••••',
+                          hintStyle: const TextStyle(color: Color(0xFF64748B)),
+                          filled: true,
+                          fillColor: const Color(0xFF1A2F52),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF2A4A72),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF2A4A72),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: _green,
+                              width: 1.5,
+                            ),
+                          ),
+                          suffixIcon: IconButton(
+                            onPressed: () => setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            ),
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                              color: const Color(0xFF64748B),
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (_error != null) ...[
+                        const SizedBox(height: 12),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF450A0A),
+                            border: Border.all(color: const Color(0xFFEF4444)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           child: Text(
-                            isAdmin
-                                ? 'Campus administrators — review, prioritize, and assign all tickets'
-                                : isMaintenance
-                                ? 'Maintenance personnel — view assigned tasks and update progress'
-                                : 'Students, faculty, and staff — report and track facility issues',
+                            _error!,
                             style: const TextStyle(
-                              color: Color(0xFF94A3B8),
-                              fontSize: 11,
-                              height: 1.5,
+                              color: Color(0xFFFCA5A5),
+                              fontSize: 12,
                             ),
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 18),
-                    Text(
-                      isAdmin
-                          ? 'ADMIN EMAIL'
-                          : isMaintenance
-                          ? 'MAINTENANCE EMAIL'
-                          : 'EMAIL ADDRESS',
-                      style: const TextStyle(
-                        color: Color(0xFF64748B),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.06,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: isAdmin || isMaintenance
-                            ? 'staff@campus.edu'
-                            : 'you@campus.edu',
-                        hintStyle: const TextStyle(color: Color(0xFF64748B)),
-                        filled: true,
-                        fillColor: const Color(0xFF1A2F52),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF2A4A72),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF2A4A72),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            color: _green,
-                            width: 1.5,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'PASSWORD',
-                      style: const TextStyle(
-                        color: Color(0xFF64748B),
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.06,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: _obscurePassword,
-                      style: const TextStyle(color: Colors.white),
-                      decoration: InputDecoration(
-                        hintText: '••••••••',
-                        hintStyle: const TextStyle(color: Color(0xFF64748B)),
-                        filled: true,
-                        fillColor: const Color(0xFF1A2F52),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF2A4A72),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF2A4A72),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: const BorderSide(
-                            color: _green,
-                            width: 1.5,
-                          ),
-                        ),
-                        suffixIcon: IconButton(
-                          onPressed: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
-                          ),
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                            color: const Color(0xFF64748B),
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (_error != null) ...[
-                      const SizedBox(height: 12),
-                      Container(
+                      const SizedBox(height: 18),
+                      SizedBox(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF450A0A),
-                          border: Border.all(color: const Color(0xFFEF4444)),
-                          borderRadius: BorderRadius.circular(8),
+                        child: FilledButton(
+                          onPressed: _submitting ? null : _handleLogin,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: _green,
+                            foregroundColor: const Color(0xFF0A1628),
+                            minimumSize: const Size.fromHeight(52),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            _submitting ? 'Signing in…' : 'Sign in',
+                            style: const TextStyle(fontWeight: FontWeight.w800),
+                          ),
                         ),
-                        child: Text(
-                          _error!,
-                          style: const TextStyle(
-                            color: Color(0xFFFCA5A5),
-                            fontSize: 12,
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: _submitting
+                              ? null
+                              : () => Navigator.of(context).push<void>(
+                                  MaterialPageRoute(
+                                    builder: (_) => RegisterPage(
+                                      onRegister: widget.onRegister,
+                                    ),
+                                  ),
+                                ),
+                          icon: const Icon(Icons.person_add_alt_1_rounded),
+                          label: const Text('Register'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size.fromHeight(48),
+                            side: const BorderSide(color: Color(0xFF54749D)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            textStyle: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
                         ),
                       ),
                     ],
-                    const SizedBox(height: 18),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: _submitting ? null : _handleLogin,
-                        style: FilledButton.styleFrom(
-                          backgroundColor: _green,
-                          foregroundColor: const Color(0xFF0A1628),
-                          minimumSize: const Size.fromHeight(52),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          _submitting ? 'Signing in…' : 'Sign in',
-                          style: const TextStyle(fontWeight: FontWeight.w800),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: _submitting
-                            ? null
-                            : () => Navigator.of(context).push<void>(
-                                MaterialPageRoute(
-                                  builder: (_) => RegisterPage(
-                                    onRegister: widget.onRegister,
-                                  ),
-                                ),
-                              ),
-                        icon: const Icon(Icons.person_add_alt_1_rounded),
-                        label: const Text('Register'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size.fromHeight(48),
-                          side: const BorderSide(color: Color(0xFF54749D)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          textStyle: const TextStyle(
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF1A2F52),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFF2A4A72)),
-                ),
-                child: Text(
-                  FirebaseService.isReady
-                      ? 'Sign in with an account enabled in Firebase Authentication.'
-                      : FirebaseService.setupMessage,
-                  style: const TextStyle(
-                    color: Color(0xFF94A3B8),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 18),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1A2F52),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFF2A4A72)),
+                  ),
+                  child: Text(
+                    FirebaseService.isReady
+                        ? 'Sign in with an account enabled in Firebase Authentication.'
+                        : FirebaseService.setupMessage,
+                    style: const TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -1157,14 +1161,6 @@ class LocalModeBadge extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              cloudConnected
-                  ? Icons.cloud_done_outlined
-                  : Icons.cloud_off_outlined,
-              size: 13,
-              color: foreground,
-            ),
-            const SizedBox(width: 4),
             Text(
               cloudConnected ? 'FIREBASE' : 'LOCAL DEMO',
               style: TextStyle(
@@ -1743,15 +1739,27 @@ class ReportCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    report.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: _ink,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          report.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: _ink,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _shortDate(context, report.createdAt),
+                        maxLines: 1,
+                        style: const TextStyle(color: _muted, fontSize: 10),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 5),
                   Text(
@@ -1765,23 +1773,22 @@ class ReportCard extends StatelessWidget {
                     children: [
                       StatusPill(status: report.status),
                       const SizedBox(width: 7),
-                      Text(
-                        report.id,
-                        style: const TextStyle(
-                          color: _muted,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                      Expanded(
+                        child: Text(
+                          report.id,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: _muted,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ],
               ),
-            ),
-            const SizedBox(width: 5),
-            Text(
-              _shortDate(context, report.createdAt),
-              style: const TextStyle(color: _muted, fontSize: 10),
             ),
           ],
         ),
@@ -2046,7 +2053,10 @@ class _MaintenanceAccessRequestsState
     try {
       await widget.store.approveMaintenanceRequest(request.uid);
       if (!mounted) return;
-      setState(() => _requests = widget.store.pendingMaintenanceRequests());
+      final requests = widget.store.pendingMaintenanceRequests();
+      setState(() {
+        _requests = requests;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${request.displayName} approved for maintenance.'),

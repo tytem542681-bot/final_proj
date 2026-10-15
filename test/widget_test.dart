@@ -95,6 +95,64 @@ void main() {
     );
   });
 
+  testWidgets('login screen scrolls when the keyboard reduces its height', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(393, 760);
+    tester.view.devicePixelRatio = 1;
+    tester.view.viewInsets = const FakeViewPadding(bottom: 320);
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetViewInsets);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: LoginPage(
+          onLogin: (role, displayName, email, password) async {},
+          onRegister: (role, displayName, email, password) async => false,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Sign in'), findsOneWidget);
+  });
+
+  testWidgets('report cards fit narrow screens with long IDs', (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final report = MaintenanceReport(
+      id: 'FT-2026-12345678901234567890',
+      title: 'A long maintenance report title',
+      category: 'Plumbing',
+      building: 'Main Building',
+      room: 'Room 22',
+      priority: ReportPriority.medium,
+      description: 'Water leak under the sink.',
+      reporter: 'alex.morgan@campus.edu',
+      createdAt: DateTime.now(),
+      status: ReportStatus.pending,
+      activities: const [],
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ListView(
+            padding: const EdgeInsets.all(20),
+            children: [ReportCard(report: report, onTap: () {})],
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(ReportCard), findsOneWidget);
+  });
+
   testWidgets('dashboard opens report form and submits a valid ticket', (
     tester,
   ) async {
@@ -285,6 +343,10 @@ void main() {
 
     expect(report.createdAt, serverTime.toLocal());
     expect(report.activities.single.createdAt, serverTime.toLocal());
+    expect(
+      (report.toJson()['activities'] as List<dynamic>).single['createdAt'],
+      serverTime.toLocal().toIso8601String(),
+    );
   });
 
   test(

@@ -294,9 +294,7 @@ class LocalStore extends ChangeNotifier {
     }
   }
 
-  Future<MaintenanceReport> createReport(
-    ReportDraft draft,
-  ) async {
+  Future<MaintenanceReport> createReport(ReportDraft draft) async {
     final title = draft.title.trim();
     final category = draft.category.trim();
     final building = draft.building.trim();
@@ -355,12 +353,6 @@ class LocalStore extends ChangeNotifier {
           .set({
             ...report.toJson(),
             'createdAt': FieldValue.serverTimestamp(),
-            'activities': [
-              {
-                ...report.activities.first.toJson(),
-                'createdAt': FieldValue.serverTimestamp(),
-              },
-            ],
             'photoPath': null,
             'ownerUid': firebaseUid,
           })
